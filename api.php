@@ -23,7 +23,7 @@
 	{
 		// url addresses to various lodestone content.
 		private $URL = array(
-			'profile'		=> 'http://eu.finalfantasyxiv.com/lodestone/character/',
+			'profile'		=> 'http://fr.finalfantasyxiv.com/lodestone/character/',
 			'achievement' 	=> '/achievement/',
 			'search'		=> '?q=%name%&worldname=%server%'
 		);
@@ -42,8 +42,8 @@
 		{
 			// Set classes
 			$this->ClassList = array(
-				"Gladiator", "Pugilist", "Marauder", "Lancer", "Archer", "Conjurer", "Thaumaturge", "Arcanist", "Carpenter", "Blacksmith", 
-				"Armorer", "Goldsmith", "Leatherworker", "Weaver", "Alchemist", "Culinarian", "Miner", "Botanist", "Fisher"
+				"Gladiateur", "Pugiliste", "Maraudeur", "Maître d'Hast", "Archer", "Élémentaliste", "Occultiste", "Arcaniste", "Menuisier", "Forgeron", 
+				"Armurier", "Orfèvre", "Tanneur", "Couturier", "Alchimiste", "Cuisinier", "Mineur", "Botaniste", "Pêcheur"
 			);
 			
 			// Set class by disicpline							
@@ -226,7 +226,7 @@
 					$Character->setRaceClan($this->find('chara_profile_title'));
 					$Character->setLegacy($this->find('bt_legacy_history'));
 					$Character->setBirthGuardianCompany($this->findRange('chara_profile_list', 60, NULL, false));
-					$Character->setCity($this->findRange('City-state', 5));
+					$Character->setCity($this->findRange('Cité-État', 5));
 					$Character->setBiography($this->findRange('txt_selfintroduction', 5));
 					$Character->setHPMPTP($this->findRange('param_power_area', 10));
 					$Character->setAttributes($this->findRange('param_list_attributes', 8));
@@ -441,8 +441,8 @@
 			$i = 0;
 			foreach($String as $Line)
 			{
-				if (stripos($Line, 'Grand Company') !== false) 	{ $Company = trim(strip_tags(html_entity_decode($String[($i + 1)]))); }
-				if (stripos($Line, 'Free Company') !== false) 	{ $FreeCompany = trim($String[($i + 1)]); }
+				if (stripos($Line, 'Grande compagnie') !== false) 	{ $Company = trim(strip_tags(html_entity_decode($String[($i + 1)]))); }
+				if (stripos($Line, 'Compagnie libre') !== false) 	{ $FreeCompany = trim($String[($i + 1)]); }
 				$i++;
 			}
 			
@@ -466,7 +466,7 @@
 		public function getFreeCompany() 	{ return $this->FreeCompany; }
 		
 		// CITY
-		public function setCity($String) { $this->City = htmlspecialchars_decode(trim($String[1]), ENT_QUOTES); }
+		public function setCity($String) { $this->City = htmlspecialchars_decode(trim($String[2]), ENT_QUOTES); }
 		public function getCity() { return $this->City; }
 		
 		// BIOGRAPHY
@@ -595,9 +595,12 @@
 					if (stripos($Line, 'item_name') !== false) { 
 						$Data = htmlspecialchars_decode(trim(html_entity_decode($A[$i + 3])), ENT_QUOTES);
 						if (
-							strpos($Data, " Arm") !== false || 
-							strpos($Data, " Grimoire") !== false || 
-							strpos($Data, " Tool") !== false
+							strpos($Data, "Arme d'") !== false || 
+							strpos($Data, "Grimoire d'") !== false || 
+							strpos($Data, "Outils d'") !== false ||
+							strpos($Data, "Arme de ") !== false || 
+							strpos($Data, "Grimoire de ") !== false || 
+							strpos($Data, "Outils de ") !== false
 						) 
 						{ $Main = $Data; $Data = 'Main'; }
 						$Temp['slot'] = strtolower($Data);
@@ -620,9 +623,10 @@
 			$this->Gear['equipped'] = $GearArray;
 			
 			// Set Active Class
-			$classjob = str_ireplace('Two-Handed ', NULL, explode("'", $Main)[0]);
+			$classjob = str_ireplace('à deux mains ', NULL,$this->multiexplode(array("'",'de'), $Main)[1]);
+			if($classjob == 'hast') $classjob="maître d'hast";
 			$this->Stats['active']['class'] = $classjob;
-			if (isset($this->Gear['soul crystal'])) { $this->Stats['active']['job'] = str_ireplace("Soul of the ", NULL, $this->Gear['soul crystal']['name']); }
+			if (isset($this->Gear['soul crystal'])) { $this->Stats['active']['job'] = str_ireplace("Cristal de ", NULL, $this->Gear['soul crystal']['name']); }
 		}
 		public function getGear()			{ return $this->Gear; }
 		public function getEquipped($Type)	{ return $this->Gear['equipped'][$Type]; }
@@ -693,7 +697,6 @@
 				// Increment
 				$i++;
 			}
-			
 			$this->ClassJob = $Temp;
 		}
 		public function getClassJob($Class) { return $this->ClassJob[strtolower($Class)]; }
@@ -729,7 +732,12 @@
 		}
 		public function isValid() { return $this->Validated; }
 		public function getErrors() { return $this->Errors; }
-		
+		protected function multiexplode ($delimiters,$string) {
+			
+			$ready = str_replace($delimiters, $delimiters[0], $string);
+			$launch = explode($delimiters[0], $ready);
+			return  $launch;
+		}
 	}		
 	
 	
