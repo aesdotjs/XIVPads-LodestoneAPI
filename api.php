@@ -626,7 +626,7 @@
 			$classjob = str_ireplace('à deux mains ', NULL,$this->multiexplode(array("'",'de'), $Main)[1]);
 			if($classjob == 'hast') $classjob="maître d'hast";
 			$this->Stats['active']['class'] = $classjob;
-			if (isset($this->Gear['soul crystal'])) { $this->Stats['active']['job'] = str_ireplace("Cristal de ", NULL, $this->Gear['soul crystal']['name']); }
+			if (isset($this->Gear['equipped']['slots']['cristal de job'])) { $this->Stats['active']['job'] = str_ireplace("Cristal de ", NULL, $this->Gear['equipped']['slots']['cristal de job']['name']); }
 		}
 		public function getGear()			{ return $this->Gear; }
 		public function getEquipped($Type)	{ return $this->Gear['equipped'][$Type]; }
